@@ -7,14 +7,22 @@ import streamlit as st
 
 from tensorflow.keras.applications.xception import preprocess_input
 
+# ==========================================================
+# GOOGLE DRIVE MODEL
+# ==========================================================
+
+FILE_ID = "1i8hPZ-WF9dbbcYjgylvim8SQMPgpw02X"
+
 MODEL_DIR = "model"
 MODEL_NAME = "Xception_AI_Human.keras"
 MODEL_PATH = os.path.join(MODEL_DIR, MODEL_NAME)
 
-FILE_ID = "1i8hPZ-WF9dbbcYjgylvim8SQMPgpw02X"
-
 URL = f"https://drive.google.com/uc?id={FILE_ID}"
 
+
+# ==========================================================
+# DOWNLOAD MODEL
+# ==========================================================
 
 def download_model():
 
@@ -22,16 +30,20 @@ def download_model():
 
     if not os.path.exists(MODEL_PATH):
 
-        with st.spinner("Downloading model... (hanya sekali)"):
+        st.info("Downloading AI model... (first time only)")
 
-            gdown.download(
-                URL,
-                MODEL_PATH,
-                quiet=False
-            )
+        gdown.download(
+            URL,
+            MODEL_PATH,
+            quiet=False
+        )
 
     return MODEL_PATH
 
+
+# ==========================================================
+# LOAD MODEL
+# ==========================================================
 
 @st.cache_resource
 def load_model():
@@ -43,20 +55,28 @@ def load_model():
     return model
 
 
+# ==========================================================
+# PREPROCESS
+# ==========================================================
+
 def preprocess_image(image):
 
     img = np.array(image)
 
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2RGB)
-
     img = cv2.resize(img, (299,299))
 
-    img = preprocess_input(img.astype(np.float32))
+    img = img.astype(np.float32)
 
-    img = np.expand_dims(img,0)
+    img = preprocess_input(img)
+
+    img = np.expand_dims(img, axis=0)
 
     return img
 
+
+# ==========================================================
+# PREDICTION
+# ==========================================================
 
 def predict(image):
 
@@ -64,18 +84,18 @@ def predict(image):
 
     x = preprocess_image(image)
 
-    prob = float(model.predict(x, verbose=0)[0][0])
+    probability = float(model.predict(x, verbose=0)[0][0])
 
-    if prob >= 0.5:
+    if probability >= 0.5:
 
-        label = "AI Generated"
+        label = "AI"
 
-        confidence = prob * 100
+        confidence = probability * 100
 
     else:
 
         label = "Human"
 
-        confidence = (1 - prob) * 100
+        confidence = (1-probability) * 100
 
-    return label, confidence, prob
+    return label, confidence, probability
