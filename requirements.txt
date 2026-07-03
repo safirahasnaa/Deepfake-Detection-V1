@@ -1,9 +1,9 @@
 streamlit
 tensorflow
-opencv-python-headless
 numpy
+opencv-python-headless
 pillow
+gdown
 pandas
 matplotlib
 scikit-learn
-gdown
