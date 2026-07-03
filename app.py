@@ -1,3 +1,9 @@
-from utils import load_xception
+from utils import predict
 
-model = load_xception()
+...
+
+if uploaded_file is not None:
+
+    image = Image.open(uploaded_file).convert("RGB")
+
+    label, confidence, probability = predict(image)
